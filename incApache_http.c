@@ -171,7 +171,11 @@ void send_response(int client_fd, int response_code, int cookie,
 
 			/*** compute file_size, mime_type, and file_modification_time of HTML_404 ***/
 /*** TO BE DONE 4.0 START ***/
-
+            if (stat_p == NULL) {
+                stat_p = &stat_buffer;
+                if (stat(HTML_404, stat_p))
+                    fail_errno("stat");
+            }
             file_size = stat_p->st_size;
             file_modification_time = (stat_p->st_mtim).tv_sec;
             mime_type = my_strdup(HTML_mime);
@@ -186,7 +190,11 @@ void send_response(int client_fd, int response_code, int cookie,
 
 			/*** compute file_size, mime_type, and file_modification_time of HTML_501 ***/
 /*** TO BE DONE 4.0 START ***/
-
+            if (stat_p == NULL) {
+                stat_p = &stat_buffer;
+                if (stat(HTML_501, stat_p))
+                    fail_errno("stat");
+            }
             file_size = stat_p->st_size;
             file_modification_time = (stat_p->st_mtim).tv_sec;
             mime_type = my_strdup(HTML_mime);

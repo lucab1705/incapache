@@ -2,7 +2,7 @@
 CFLAGS= -DHTML_404='"404_Not_Found.html"' \
         -DHTML_501='"501_Method_Not_Implemented.html"' \
 	-DDEBUG \
-	# -DINCaPACHE_4_1
+	-DINCaPACHE_4_1
 	# -DPRETEND_TO_BE_ROOT \
 	# -g3 -O0 -Wall -pedantic \
         -DIMAGE='"uncadunca.jpg"' \

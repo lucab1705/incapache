@@ -77,10 +77,29 @@ void join_all_threads(int conn_no)
 	 *** no_free_threads, no_response_threads[conn_no], and
 	 *** connection_no[i] ***/
 /*** TO BE DONE 4.1 START ***/
-
-
+    debug("start of join_all_threads(%d)\n", conn_no);
+    pthread_mutex_lock(&threads_mutex);
+    if(to_join[conn_no] == NULL){
+        pthread_mutex_unlock(&threads_mutex);
+        debug(" ... was first thread\n");
+    }
+    else{
+        i = to_join[conn_no] - thread_ids;
+        to_join[conn_no] = NULL;
+        assert(conn_no == connection_no[i]);
+        pthread_t tmp = thread_ids[i];
+        pthread_mutex_unlock(&threads_mutex);
+        if(pthread_join(tmp, NULL) != 0)
+            fail_errno("join_all_threads");
+        pthread_mutex_lock(&threads_mutex);
+        ++no_free_threads;
+        --no_response_threads[conn_no];
+        connection_no[i] = FREE_SLOT;
+        pthread_mutex_unlock(&threads_mutex);
+        debug(" ... was not first thread\n");
+    }
+    debug("end of join_all_threads(%d)\n", conn_no);
 /*** TO BE DONE 4.1 END ***/
-
 }
 
 void join_prev_thread(int thrd_no)
@@ -96,8 +115,28 @@ void join_prev_thread(int thrd_no)
 	 *** no_free_threads, no_response_threads[conn_no], and connection_no[i],
 	 *** avoiding race conditions ***/
 /*** TO BE DONE 4.1 START ***/
-
-
+    pthread_mutex_lock(&threads_mutex);
+    if(to_join[thrd_no] == NULL){
+        pthread_mutex_unlock(&threads_mutex);
+        debug(" ... was first thread\n");
+    }
+    else{
+        i = to_join[thrd_no] - thread_ids;
+        conn_no = connection_no[i];
+        to_join[thrd_no] = NULL;
+        assert(conn_no >= 0);
+        pthread_t tmp = thread_ids[i];
+        pthread_mutex_unlock(&threads_mutex);
+        if(pthread_join(tmp, NULL) != 0)
+            fail_errno("join_prev_thread");
+        pthread_mutex_lock(&threads_mutex);
+        --no_response_threads[conn_no];
+        ++no_free_threads;
+        connection_no[i] = FREE_SLOT;
+        pthread_mutex_unlock(&threads_mutex);
+        debug(" ... was not first thread\n");
+    }
+    debug("end of join_prev_thread(%d)\n", thrd_no);
 /*** TO BE DONE 4.1 END ***/
 
 }
@@ -142,6 +181,7 @@ void *client_connection_thread(void *vp)
 	/*** properly initialize the thread queue to_join ***/
 /*** TO BE DONE 4.1 START ***/
 
+    to_join[connection_no] = NULL;
 
 /*** TO BE DONE 4.1 END ***/
 
@@ -226,6 +266,8 @@ void send_resp_thread(int out_socket, int response_code, int cookie,
 	/*** enqueue the current thread in the "to_join" data structure ***/
 /*** TO BE DONE 4.1 START ***/
 
+    to_join[new_thread_idx] = to_join[connection_idx];
+    to_join[connection_idx] = &thread_ids[new_thread_idx];
 
 /*** TO BE DONE 4.1 END ***/
 
