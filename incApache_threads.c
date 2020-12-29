@@ -124,14 +124,17 @@ void join_prev_thread(int thrd_no)
         i = to_join[thrd_no] - thread_ids;
         conn_no = connection_no[i];
         to_join[thrd_no] = NULL;
-        assert(conn_no >= 0);
+        debug("      ... join_prev_thread(%d): joining with %ld, connection %d\n",thrd_no,i,conn_no);
         pthread_t tmp = thread_ids[i];
         pthread_mutex_unlock(&threads_mutex);
+        assert(conn_no >= 0);
         if(pthread_join(tmp, NULL) != 0)
             fail_errno("join_prev_thread");
         pthread_mutex_lock(&threads_mutex);
         --no_response_threads[conn_no];
-        ++no_free_threads;
+        if (no_response_threads[conn_no] > 0) {
+            ++no_free_threads;
+        }
         connection_no[i] = FREE_SLOT;
         pthread_mutex_unlock(&threads_mutex);
         debug(" ... was not first thread\n");

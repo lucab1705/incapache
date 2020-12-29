@@ -264,6 +264,7 @@ void send_response(int client_fd, int response_code, int cookie,
 
         if(sendfile(client_fd, fd, NULL, file_size) < 0)
             fail_errno("sendfile");
+        close(fd);
 
 /*** TO BE DONE 4.0 END ***/
 
