@@ -50,7 +50,7 @@
 #include <errno.h>
 #include <assert.h>
 
-#define MAX_CONNECTIONS 12
+#define MAX_CONNECTIONS 8
 #define MAX_COOKIES 256
 
 #ifdef INCaPACHE_4_1

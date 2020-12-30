@@ -124,7 +124,6 @@ void join_prev_thread(int thrd_no)
         i = to_join[thrd_no] - thread_ids;
         conn_no = connection_no[i];
         to_join[thrd_no] = NULL;
-        debug("      ... join_prev_thread(%d): joining with %ld, connection %d\n",thrd_no,i,conn_no);
         pthread_t tmp = thread_ids[i];
         pthread_mutex_unlock(&threads_mutex);
         assert(conn_no >= 0);

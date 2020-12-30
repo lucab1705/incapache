@@ -64,6 +64,9 @@ int get_new_UID(void)
 /*** TO BE DONE 4.0 START ***/
     pthread_mutex_lock(&cookie_mutex);
 
+    //evitiamo il possibile overflow di CurUID
+    if(CurUID + 1 < 0)
+        CurUID = 0;
     retval = CurUID++ % MAX_COOKIES;
     UserTracker[retval] = 0;
 
@@ -85,8 +88,10 @@ int keep_track_of_UID(int myUID)
 /*** TO BE DONE 4.0 START ***/
     pthread_mutex_lock(&cookie_mutex);
 
+    //Evitiamo il possibile overflow di UserTracker[myUID]
+    if(UserTracker[myUID] + 1 < 0)
+        UserTracker[myUID] = 0;
     newcount = ++UserTracker[myUID];
-    //TODO: Possibile overflow di UserTracker
 
     pthread_mutex_unlock(&cookie_mutex);
 /*** TO BE DONE 4.0 END ***/
